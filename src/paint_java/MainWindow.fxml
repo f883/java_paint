@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="595.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="paint_java.MainWindowController">
+   <children>
+      <Label fx:id="labelX" layoutX="157.0" layoutY="452.0" text="#x" />
+      <Line endX="419.0" endY="5.0" layoutX="176.0" layoutY="444.0" startX="-176.0" startY="5.0" />
+      <Label fx:id="labelY" layoutX="264.0" layoutY="452.0" text="#y" />
+      <MenuBar prefHeight="29.0" prefWidth="595.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Open..." />
+                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#onSaveButtonPressed" text="Save..." />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help" />
+            <Menu mnemonicParsing="false" text="About" />
+        </menus>
+      </MenuBar>
+      <ToolBar layoutY="29.0" prefHeight="40.0" prefWidth="595.0">
+        <items>
+            <Label text="Tools:" />
+          <Button fx:id="buttonModeBrush" mnemonicParsing="false" onAction="#onBrushModeSelected" prefHeight="27.0" prefWidth="81.0" text="Brush" />
+            <Button fx:id="buttonModeLine" mnemonicParsing="false" onAction="#onLineModeSelected" prefHeight="27.0" prefWidth="81.0" text="Line" />
+            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Ellipse" />
+            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Ereaser" />
+            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Star" />
+        </items>
+      </ToolBar>
+      <ScrollPane layoutY="111.0" onMouseMoved="#onMouseMovedTest" prefHeight="339.0" prefWidth="595.0">
+         <content>
+            <Group fx:id="group">
+               <children>
+                  <ImageView fx:id="imageView" fitHeight="246.0" fitWidth="270.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </Group>
+         </content>
+      </ScrollPane>
+      <Label fx:id="labelMode" layoutX="6.0" layoutY="452.0" text="#selectedMode" />
+      <ToolBar layoutY="69.0" prefHeight="40.0" prefWidth="595.0">
+         <items>
+            <Label text="Size:" />
+            <TextField prefHeight="27.0" prefWidth="43.0" />
+            <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
+            <Label text="Color:" />
+            <GridPane prefHeight="30.0" prefWidth="30.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Rectangle fx:id="colorRectangle" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="26.0" stroke="BLACK" strokeType="INSIDE" width="26.0" />
+               </children>
+            </GridPane>
+            <Button mnemonicParsing="false" onAction="#onColorSetButtonPressed" text="Select" />
+            <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
+            <Label text="Zoom:" />
+            <Button mnemonicParsing="false" text="+" />
+            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" text="-" />
+            <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
+            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#onSaveButtonPressed" text="Save" />
+         </items>
+      </ToolBar>
+      <Label fx:id="labelTest" layoutX="428.0" layoutY="452.0" text="#test" />
+      <BorderPane prefHeight="200.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>
