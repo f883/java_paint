@@ -8,17 +8,15 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
-    public static Stage root1;
-    public static Main main1;
+    public static Stage rootStage;
+    public static Main rootMain;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 
-        // TODO выяснить как запускать проект из ИДЕА
-
-        root1 = primaryStage;
-        main1 = this;
+        rootStage = primaryStage;
+        rootMain = this;
 
         primaryStage.setTitle("Test image");
         primaryStage.setScene(new Scene(root, primaryStage.getWidth(), primaryStage.getHeight()));

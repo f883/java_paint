@@ -26,8 +26,9 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Open..." />
-                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#onSaveButtonPressed" text="Save..." />
+              <MenuItem mnemonicParsing="false" onAction="#loadImage" text="Open..." />
+                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImage" text="Save..." />
+                  <MenuItem mnemonicParsing="false" onAction="#loadImage" text="Open in new window..." />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help" />
@@ -38,15 +39,16 @@
         <items>
             <Label text="Tools:" />
           <Button fx:id="buttonModeBrush" mnemonicParsing="false" onAction="#onBrushModeSelected" prefHeight="27.0" prefWidth="81.0" text="Brush" />
-            <Button fx:id="buttonModeLine" mnemonicParsing="false" onAction="#onLineModeSelected" prefHeight="27.0" prefWidth="81.0" text="Line" />
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Ellipse" />
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Ereaser" />
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Star" />
+            <Button mnemonicParsing="false" onAction="#onLineModeSelected" prefHeight="27.0" prefWidth="81.0" text="Line" />
+            <Button fx:id="buttonModeLine" mnemonicParsing="false" onAction="#onRectangleModeSelected" prefHeight="27.0" prefWidth="81.0" text="Rectangle" />
+            <Button mnemonicParsing="false" onAction="#onEllipseModeSelected" prefHeight="27.0" prefWidth="81.0" text="Ellipse" />
+            <Button mnemonicParsing="false" onAction="#onEreaserModeSelected" prefHeight="27.0" prefWidth="81.0" text="Ereaser" />
+            <Button mnemonicParsing="false" onAction="#onStarModeSelected" prefHeight="27.0" prefWidth="81.0" text="Star" />
         </items>
       </ToolBar>
-      <ScrollPane layoutY="111.0" onMouseMoved="#onMouseMovedTest" prefHeight="509.0" prefWidth="744.0">
+      <ScrollPane layoutY="111.0" prefHeight="509.0" prefWidth="744.0">
          <content>
-            <Group fx:id="group">
+            <Group fx:id="paintingGroup">
                <children>
                   <ImageView fx:id="imageView" fitHeight="246.0" fitWidth="270.0" pickOnBounds="true" preserveRatio="true" />
                </children>
@@ -57,7 +59,7 @@
       <ToolBar layoutY="69.0" prefHeight="42.0" prefWidth="744.0">
          <items>
             <Label text="Size:" />
-            <TextField prefHeight="27.0" prefWidth="43.0" />
+            <TextField fx:id="textBoxSize" prefHeight="27.0" prefWidth="43.0" />
             <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
             <Label text="Color:" />
             <GridPane prefHeight="30.0" prefWidth="30.0">
@@ -68,7 +70,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Rectangle fx:id="colorRectangle" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="26.0" stroke="BLACK" strokeType="INSIDE" width="26.0" />
+                  <Rectangle fx:id="colorRectangle" arcHeight="5.0" arcWidth="5.0" height="26.0" strokeType="INSIDE" width="26.0" />
                </children>
             </GridPane>
             <Button mnemonicParsing="false" onAction="#onColorSetButtonPressed" text="Select" />
@@ -76,8 +78,6 @@
             <Label text="Zoom:" />
             <Button mnemonicParsing="false" text="+" />
             <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" text="-" />
-            <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
-            <Button fx:id="saveButton" mnemonicParsing="false" onAction="#onSaveButtonPressed" text="Save" />
          </items>
       </ToolBar>
       <Label fx:id="labelTest" layoutX="481.0" layoutY="620.0" text="#test" />
