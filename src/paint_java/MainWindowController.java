@@ -9,10 +9,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -39,10 +39,6 @@ public class MainWindowController {
     private int _mouseReleasedX;
     private int _mouseReleasedY;
 
-    public void setColor(Color color){
-        _color = color;
-    }
-
     @FXML
     public Group group;
     @FXML
@@ -63,17 +59,6 @@ public class MainWindowController {
     public Label labelTest;
     @FXML
     public Button saveButton;
-
-    @FXML
-    public void onMouseButtonPressed(){
-        _mousePressedX = 0;
-        _mousePressedY = 0;
-    }
-
-    @FXML
-    public void onMouseButtonReleased(){
-
-    }
 
     @FXML
     public void onBrushModeSelected(){
@@ -132,11 +117,10 @@ public class MainWindowController {
             }
             catch (IOException ex)
             {
-                ex.printStackTrace();
+                System.out.println(ex.getMessage());
             }
         }
     }
-
 
     @FXML
     public void initialize(){
@@ -149,45 +133,24 @@ public class MainWindowController {
         imageView.setImage(_image);
 
         imageView.setOnMouseDragged(event -> {
-            switch (_mode){
-                case brush:{
-                    double x=event.getX();
-                    double y=event.getY();
+            if (_mode == PaintModes.brush) {
+                var line = new Line(_mousePressedX, _mousePressedY, event.getX(), event.getY());
+                line.setFill(_color);
+                group.getChildren().add(line);
 
-                    if (x < 0) break;
-                    if (y < 0) break;
-                    if (x > _image.getWidth()) break;
-                    if (y > _image.getHeight()) break;
-
-                    labelX.setText(String.valueOf(x));
-                    labelY.setText(String.valueOf(y));
-
-                    WritableImage wi=new WritableImage(_image.getPixelReader(),(int)_image.getWidth(),(int)_image.getHeight());
-                    PixelWriter pw=wi.getPixelWriter();
-
-                    pw.setColor((int)x,(int)y, _color);
-
-                    _image = wi;
-                    imageView.setImage(wi);
-                    break;
-                }
-                case line:{
-
-                    break;
-                }
-            }
-        });
-        imageView.setOnMousePressed(event -> {
-            if (_mode == PaintModes.line) {
                 _mousePressedX = (int) event.getX();
                 _mousePressedY = (int) event.getY();
             }
         });
+        imageView.setOnMousePressed(event -> {
+            _mousePressedX = (int) event.getX();
+            _mousePressedY = (int) event.getY();
+        });
         imageView.setOnMouseReleased(event -> {
-            if (_mode == PaintModes.line) {
-                _mouseReleasedX = (int) event.getX();
-                _mouseReleasedY = (int) event.getY();
+            _mouseReleasedX = (int) event.getX();
+            _mouseReleasedY = (int) event.getY();
 
+            if (_mode == PaintModes.line) {
                 int tempX = Math.min(_mouseReleasedX, _mousePressedX);
                 int tempY = Math.min(_mouseReleasedY, _mousePressedY);
 
