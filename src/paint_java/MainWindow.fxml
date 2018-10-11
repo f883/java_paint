@@ -17,12 +17,12 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="474.0" prefWidth="595.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="paint_java.MainWindowController">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="636.0" prefWidth="744.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="paint_java.MainWindowController">
    <children>
-      <Label fx:id="labelX" layoutX="157.0" layoutY="452.0" text="#x" />
-      <Line endX="419.0" endY="5.0" layoutX="176.0" layoutY="444.0" startX="-176.0" startY="5.0" />
-      <Label fx:id="labelY" layoutX="264.0" layoutY="452.0" text="#y" />
-      <MenuBar prefHeight="29.0" prefWidth="595.0">
+      <Label fx:id="labelX" layoutX="195.0" layoutY="620.0" text="#x" />
+      <Line endX="568.0" endY="5.0" layoutX="176.0" layoutY="615.0" startX="-176.0" startY="5.0" />
+      <Label fx:id="labelY" layoutX="261.0" layoutY="620.0" text="#y" />
+      <MenuBar prefHeight="29.0" prefWidth="744.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -34,7 +34,7 @@
             <Menu mnemonicParsing="false" text="About" />
         </menus>
       </MenuBar>
-      <ToolBar layoutY="29.0" prefHeight="40.0" prefWidth="595.0">
+      <ToolBar layoutY="29.0" prefHeight="40.0" prefWidth="744.0">
         <items>
             <Label text="Tools:" />
           <Button fx:id="buttonModeBrush" mnemonicParsing="false" onAction="#onBrushModeSelected" prefHeight="27.0" prefWidth="81.0" text="Brush" />
@@ -44,7 +44,7 @@
             <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="81.0" text="Star" />
         </items>
       </ToolBar>
-      <ScrollPane layoutY="111.0" onMouseMoved="#onMouseMovedTest" prefHeight="339.0" prefWidth="595.0">
+      <ScrollPane layoutY="111.0" onMouseMoved="#onMouseMovedTest" prefHeight="509.0" prefWidth="744.0">
          <content>
             <Group fx:id="group">
                <children>
@@ -53,8 +53,8 @@
             </Group>
          </content>
       </ScrollPane>
-      <Label fx:id="labelMode" layoutX="6.0" layoutY="452.0" text="#selectedMode" />
-      <ToolBar layoutY="69.0" prefHeight="40.0" prefWidth="595.0">
+      <Label fx:id="labelMode" layoutX="1.0" layoutY="620.0" text="#selectedMode" />
+      <ToolBar layoutY="69.0" prefHeight="42.0" prefWidth="744.0">
          <items>
             <Label text="Size:" />
             <TextField prefHeight="27.0" prefWidth="43.0" />
@@ -80,6 +80,6 @@
             <Button fx:id="saveButton" mnemonicParsing="false" onAction="#onSaveButtonPressed" text="Save" />
          </items>
       </ToolBar>
-      <Label fx:id="labelTest" layoutX="428.0" layoutY="452.0" text="#test" />
+      <Label fx:id="labelTest" layoutX="481.0" layoutY="620.0" text="#test" />
    </children>
 </AnchorPane>

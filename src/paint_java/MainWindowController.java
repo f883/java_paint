@@ -34,6 +34,10 @@ public class MainWindowController {
     private Color _color = new Color(1, 1, 1, 1);
     private Image _image;
     private String _currentImagePath = "";
+    private int _mousePressedX;
+    private int _mousePressedY;
+    private int _mouseReleasedX;
+    private int _mouseReleasedY;
 
     public void setColor(Color color){
         _color = color;
@@ -59,6 +63,17 @@ public class MainWindowController {
     public Label labelTest;
     @FXML
     public Button saveButton;
+
+    @FXML
+    public void onMouseButtonPressed(){
+        _mousePressedX = 0;
+        _mousePressedY = 0;
+    }
+
+    @FXML
+    public void onMouseButtonReleased(){
+
+    }
 
     @FXML
     public void onBrushModeSelected(){
@@ -154,15 +169,32 @@ public class MainWindowController {
 
                     _image = wi;
                     imageView.setImage(wi);
+                    break;
                 }
                 case line:{
-                    /*
-                    javafx.scene.shape.Rectangle rectangle = new Rectangle(40, 40, 300, 300);
-                    rectangle.setFill(Color.RED);
-                    //group = new Group();
-                    group.getChildren().add(rectangle);
-                    */
+
+                    break;
                 }
+            }
+        });
+        imageView.setOnMousePressed(event -> {
+            if (_mode == PaintModes.line) {
+                _mousePressedX = (int) event.getX();
+                _mousePressedY = (int) event.getY();
+            }
+        });
+        imageView.setOnMouseReleased(event -> {
+            if (_mode == PaintModes.line) {
+                _mouseReleasedX = (int) event.getX();
+                _mouseReleasedY = (int) event.getY();
+
+                int tempX = Math.min(_mouseReleasedX, _mousePressedX);
+                int tempY = Math.min(_mouseReleasedY, _mousePressedY);
+
+                javafx.scene.shape.Rectangle rectangle = new Rectangle(tempX,
+                        tempY, Math.abs(_mousePressedX - _mouseReleasedX), Math.abs(_mousePressedY - _mouseReleasedY));
+                rectangle.setFill(_color);
+                group.getChildren().add(rectangle);
             }
         });
     }
