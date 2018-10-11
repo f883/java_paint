@@ -122,7 +122,6 @@ public class MainWindowController {
         }
     }
 
-
     @FXML
     public void initialize(){
         labelMode.setText("tool: " + _mode.name());
@@ -154,14 +153,16 @@ public class MainWindowController {
 
                     _image = wi;
                     imageView.setImage(wi);
+                    break;
                 }
                 case line:{
-                    /*
+
                     javafx.scene.shape.Rectangle rectangle = new Rectangle(40, 40, 300, 300);
                     rectangle.setFill(Color.RED);
                     //group = new Group();
                     group.getChildren().add(rectangle);
-                    */
+
+                    break;
                 }
             }
         });
