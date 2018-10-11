@@ -152,16 +152,16 @@ public class MainWindowController {
 
                     pw.setColor((int)x,(int)y, _color);
 
-
-
                     _image = wi;
                     imageView.setImage(wi);
                 }
                 case line:{
+                    /*
                     javafx.scene.shape.Rectangle rectangle = new Rectangle(40, 40, 300, 300);
                     rectangle.setFill(Color.RED);
                     //group = new Group();
                     group.getChildren().add(rectangle);
+                    */
                 }
             }
         });
