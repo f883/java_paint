@@ -15,6 +15,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 
+        // TODO выяснить как запускать проект из ИДЕА
+
         root1 = primaryStage;
         main1 = this;
 

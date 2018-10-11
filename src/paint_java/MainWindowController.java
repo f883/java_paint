@@ -133,8 +133,6 @@ public class MainWindowController {
         imageView.setFitWidth(_image.getWidth());
         imageView.setImage(_image);
 
-        //group.getChildren().add(imageView);
-
         imageView.setOnMouseDragged(event -> {
             switch (_mode){
                 case brush:{
