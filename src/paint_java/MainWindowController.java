@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,13 +20,11 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-
+import java.util.*;
 import javafx.embed.swing.SwingFXUtils;
-
 import javax.imageio.ImageIO;
 
 enum PaintModes { brush, rectangle, line, ellipse, ereaser, star };
@@ -41,7 +40,16 @@ public class MainWindowController {
     private int _mouseReleasedX;
     private int _mouseReleasedY;
     private FileChooser _fileChooser = new FileChooser();
+    private double _origImageWight;
+    private double _origImageHeight;
+    private double _scale = 1;
+    private double _scrollPaneVval = 0;
+    private double _scrollPaneHval = 0;
 
+    @FXML
+    public ScrollPane scrollPane;
+    @FXML
+    public Label scaleLabel;
     @FXML
     public TextField textBoxSize;
     @FXML
@@ -62,17 +70,35 @@ public class MainWindowController {
     public javafx.scene.shape.Rectangle colorRectangle;
     @FXML
     public Label labelTest;
-    @FXML
-    public Button saveButton;
 
-    @FXML
-    public void loadImage(){
-        _currentImagePath = _fileChooser.showOpenDialog(null).getPath();
-        _image = new Image("file:" + _currentImagePath);
+    public void loadImage(String fileName){
+        paintingGroup.getChildren().clear();
+        paintingGroup.getChildren().add(imageView);
+        _image = new Image("file:" + fileName);
         //_image = new Image("file:source/test.jpg");
         imageView.setFitHeight(_image.getHeight());
         imageView.setFitWidth(_image.getWidth());
         imageView.setImage(_image);
+        _origImageHeight = _image.getHeight();
+        _origImageWight = _image.getWidth();
+
+        double tm = 1;
+        while (tm > _scale){
+            imageView.setFitHeight(imageView.getFitHeight() / 2);
+            tm = tm / 2;
+        }
+        scrollPane.setVvalue(_scrollPaneVval);
+        scrollPane.setHvalue(_scrollPaneHval);
+    }
+
+    public String getImagePath(){
+        return _fileChooser.showOpenDialog(null).getPath();
+    }
+
+    @FXML
+    public void loadImageWithDialog(){
+        _currentImagePath = getImagePath();
+        loadImage(_currentImagePath);
     }
 
     @FXML
@@ -107,6 +133,30 @@ public class MainWindowController {
     }
 
     @FXML
+    public void onPlusViewButtonPressed(){
+        if (_scale < 1) {
+            _scale = _scale * 2;
+            scaleLabel.setText(String.valueOf(_scale * 100) + "%");
+
+            imageView.setFitHeight(imageView.getFitHeight() * 2);
+
+            //textBoxSize.setText(String.valueOf(Double.valueOf(textBoxSize.getText()) * 2));
+        }
+    }
+
+    @FXML
+    public void onMinusViewButtonPressed(){
+        if (_scale > 0.1) {
+            _scale = _scale / 2;
+            scaleLabel.setText(String.valueOf(_scale * 100) + "%");
+
+            imageView.setFitHeight(imageView.getFitHeight() / 2);
+
+            //textBoxSize.setText(String.valueOf(Double.valueOf(textBoxSize.getText()) / 2));
+        }
+    }
+
+    @FXML
     public void onColorSetButtonPressed(){
         FXMLLoader loader = new FXMLLoader(Main.rootMain.getClass()
                 .getResource("SelectColorWindow.fxml"));
@@ -133,22 +183,53 @@ public class MainWindowController {
     }
 
     @FXML
-    public void saveImage(){
-        _fileChooser.setInitialFileName("test.png");
-        String path = _fileChooser.showSaveDialog(null).getPath();
+    public void saveImageWithDialog(){
+        _fileChooser.setInitialFileName(_currentImagePath); // "test.png"
+        _currentImagePath = _fileChooser.showSaveDialog(null).getPath();
 
-        if (!path.isEmpty()){
-            try
-            {
-                WritableImage snapshot = paintingGroup.snapshot(new SnapshotParameters(), null);
-                File file = new File(path);
-                RenderedImage renderedImage = SwingFXUtils.fromFXImage(snapshot, null);
-                ImageIO.write(renderedImage, "png", file);
+        saveImage();
+    }
+
+    public void saveImage(){
+        imageView.setFitHeight(_origImageHeight);
+        imageView.setFitWidth(_origImageWight);
+
+        boolean is_end = false;
+        int i = 1;
+        ArrayList<Line> tmlList = new ArrayList();
+
+        while (!is_end){
+            try {
+                var tt = (Line) paintingGroup.getChildren().get(i++);
+                tt.setStartX(tt.getStartX() * (1.0 / _scale));
+                tt.setStartY(tt.getStartY() * (1.0 / _scale));
+                tt.setEndX(tt.getEndX() * (1.0 / _scale));
+                tt.setEndY(tt.getEndY() * (1.0 / _scale));
+                tt.strokeWidthProperty().setValue(Double.valueOf(textBoxSize.getText()));
+                tmlList.add(tt);
             }
-            catch (IOException ex)
-            {
-                System.out.println(ex.getMessage());
+            catch (Exception e){
+                is_end = true;
             }
+        }
+
+        paintingGroup.getChildren().clear();
+
+        paintingGroup.getChildren().add(0, imageView);
+
+        for (int j = 0; j < tmlList.size(); j++)
+            paintingGroup.getChildren().add(tmlList.get(j));
+
+        try
+        {
+            WritableImage snapshot = paintingGroup.snapshot(new SnapshotParameters(), null);
+            File file = new File(_currentImagePath);
+            RenderedImage renderedImage = SwingFXUtils.fromFXImage(snapshot, null);
+            ImageIO.write(renderedImage, "png", file);
+        }
+        catch (IOException ex)
+        {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -158,11 +239,12 @@ public class MainWindowController {
         colorRectangle.setFill(_color);
         textBoxSize.setText("1");
 
-        loadImage();
+        loadImageWithDialog();
 
         imageView.setOnMouseDragged(event -> {
-            if (event.getX() >= 0 && event.getY() >= 0 &&
-                    event.getX() <= _image.getWidth() && event.getY() <= _image.getHeight()) {
+            if (event.getX() >= 0 &&
+                    event.getY() >= 0 && //  - (Integer.valueOf(textBoxSize.getText()))
+                    event.getX() <= _image.getWidth()*_scale && event.getY() <= _image.getHeight()*_scale) {
                 if (_mode == PaintModes.brush || _mode == PaintModes.ereaser) {
                     var line = new Line(_mousePressedX, _mousePressedY, event.getX(), event.getY());
                     if (_mode == PaintModes.brush)
@@ -170,8 +252,7 @@ public class MainWindowController {
                     else
                         line.setStroke(_ereaserColor);
 
-
-                    line.strokeWidthProperty().setValue(Integer.valueOf(textBoxSize.getText()));
+                    line.strokeWidthProperty().setValue(Integer.valueOf(textBoxSize.getText())*_scale);
                     paintingGroup.getChildren().add(line);
 
                     _mousePressedX = (int) event.getX();
@@ -186,8 +267,13 @@ public class MainWindowController {
             }
         });
         imageView.setOnMouseReleased(event -> {
-            if (event.getX() >= 0 && event.getY() >= 0 &&
-                    event.getX() <= _image.getWidth() && event.getY() <= _image.getHeight()) {
+            _scrollPaneHval = scrollPane.getHvalue();
+            _scrollPaneVval = scrollPane.getVvalue();
+            saveImage();
+            loadImage(_currentImagePath);
+            if (event.getX() >= 0 &&
+                    event.getY() >= 0 &&
+                    event.getX() <= _image.getWidth()*_scale && event.getY() <= _image.getHeight()*_scale) {
                 _mouseReleasedX = (int) event.getX();
                 _mouseReleasedY = (int) event.getY();
 

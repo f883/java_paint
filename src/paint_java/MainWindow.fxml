@@ -26,9 +26,9 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#loadImage" text="Open..." />
-                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImage" text="Save..." />
-                  <MenuItem mnemonicParsing="false" onAction="#loadImage" text="Open in new window..." />
+              <MenuItem mnemonicParsing="false" onAction="#loadImageWithDialog" text="Open..." />
+                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImageWithDialog" text="Save..." />
+                  <MenuItem mnemonicParsing="false" onAction="#loadImageWithDialog" text="Open in new window..." />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help" />
@@ -46,7 +46,7 @@
             <Button mnemonicParsing="false" onAction="#onStarModeSelected" prefHeight="27.0" prefWidth="81.0" text="Star" />
         </items>
       </ToolBar>
-      <ScrollPane layoutY="111.0" prefHeight="509.0" prefWidth="744.0">
+      <ScrollPane fx:id="scrollPane" layoutY="111.0" prefHeight="509.0" prefWidth="744.0">
          <content>
             <Group fx:id="paintingGroup">
                <children>
@@ -76,8 +76,10 @@
             <Button mnemonicParsing="false" onAction="#onColorSetButtonPressed" text="Select" />
             <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
             <Label text="Zoom:" />
-            <Button mnemonicParsing="false" text="+" />
-            <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="27.0" text="-" />
+            <Label fx:id="scaleLabel" prefHeight="17.0" prefWidth="46.0" text="100%" textAlignment="RIGHT" />
+            <Button mnemonicParsing="false" onAction="#onPlusViewButtonPressed" text="+" />
+            <Button mnemonicParsing="false" onAction="#onMinusViewButtonPressed" prefHeight="27.0" prefWidth="27.0" text="-" />
+            <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
          </items>
       </ToolBar>
       <Label fx:id="labelTest" layoutX="481.0" layoutY="620.0" text="#test" />
