@@ -27,11 +27,20 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#loadImageWithDialog" text="Open..." />
-                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImageWithDialog" text="Save..." />
-                  <MenuItem mnemonicParsing="false" onAction="#loadImageWithDialog" text="Open in new window..." />
+                  <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImageWithDialog" text="Save as..." />
+                  <MenuItem fx:id="saveBtn1" mnemonicParsing="false" onAction="#saveImage" text="Save" />
+                  <MenuItem fx:id="saveBtn2" mnemonicParsing="false" onAction="#quit" text="Quit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help" />
+            <Menu mnemonicParsing="false" text="Effects">
+               <items>
+                  <MenuItem fx:id="saveBtn11" mnemonicParsing="false" onAction="#setGaussianBlur" text="Gaussian blur" />
+                  <MenuItem mnemonicParsing="false" onAction="#setHighContrast" text="High contrast" />
+                  <MenuItem fx:id="saveBtn212" mnemonicParsing="false" onAction="#setLowContrast" text="Default contrast" />
+                  <MenuItem fx:id="saveBtn211" mnemonicParsing="false" onAction="#setNegative" text="Negative" />
+                  <MenuItem fx:id="saveBtn213" mnemonicParsing="false" onAction="#quit" text="e5" />
+               </items>
+            </Menu>
             <Menu mnemonicParsing="false" text="About" />
         </menus>
       </MenuBar>
