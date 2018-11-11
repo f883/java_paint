@@ -9,6 +9,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -28,17 +29,20 @@
             <items>
               <MenuItem mnemonicParsing="false" onAction="#loadImageWithDialog" text="Open..." />
                   <MenuItem fx:id="saveBtn" mnemonicParsing="false" onAction="#saveImageWithDialog" text="Save as..." />
-                  <MenuItem fx:id="saveBtn1" mnemonicParsing="false" onAction="#saveImage" text="Save" />
-                  <MenuItem fx:id="saveBtn2" mnemonicParsing="false" onAction="#quit" text="Quit" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveImage" text="Save" />
+                  <MenuItem mnemonicParsing="false" onAction="#quit" text="Quit" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Effects">
                <items>
-                  <MenuItem fx:id="saveBtn11" mnemonicParsing="false" onAction="#setGaussianBlur" text="Gaussian blur" />
+                  <MenuItem mnemonicParsing="false" onAction="#setGaussianBlur" text="Gaussian blur" />
                   <MenuItem mnemonicParsing="false" onAction="#setHighContrast" text="High contrast" />
-                  <MenuItem fx:id="saveBtn212" mnemonicParsing="false" onAction="#setLowContrast" text="Default contrast" />
-                  <MenuItem fx:id="saveBtn211" mnemonicParsing="false" onAction="#setNegative" text="Negative" />
-                  <MenuItem fx:id="saveBtn213" mnemonicParsing="false" onAction="#quit" text="e5" />
+                  <MenuItem mnemonicParsing="false" onAction="#setLowContrast" text="Default contrast" />
+                  <MenuItem mnemonicParsing="false" onAction="#setNegative" text="Negative" />
+                  <MenuItem mnemonicParsing="false" onAction="#setSharpness" text="Sharpeness" />
+                  <MenuItem mnemonicParsing="false" onAction="#setDistraction" text="Distraction" />
+                  <MenuItem mnemonicParsing="false" onAction="#quit" text="e5" />
+                  <MenuItem mnemonicParsing="false" onAction="#quit" text="e5" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="About" />
@@ -47,12 +51,36 @@
       <ToolBar layoutY="29.0" prefHeight="40.0" prefWidth="744.0">
         <items>
             <Label text="Tools:" />
-          <Button fx:id="buttonModeBrush" mnemonicParsing="false" onAction="#onBrushModeSelected" prefHeight="27.0" prefWidth="81.0" text="Brush" />
-            <Button mnemonicParsing="false" onAction="#onLineModeSelected" prefHeight="27.0" prefWidth="81.0" text="Line" />
-            <Button fx:id="buttonModeLine" mnemonicParsing="false" onAction="#onRectangleModeSelected" prefHeight="27.0" prefWidth="81.0" text="Rectangle" />
-            <Button mnemonicParsing="false" onAction="#onEllipseModeSelected" prefHeight="27.0" prefWidth="81.0" text="Ellipse" />
-            <Button mnemonicParsing="false" onAction="#onEreaserModeSelected" prefHeight="27.0" prefWidth="81.0" text="Ereaser" />
-            <Button mnemonicParsing="false" onAction="#onStarModeSelected" prefHeight="27.0" prefWidth="81.0" text="Star" />
+            <ImageView fx:id="pencilIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onBrushModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/pencil.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="lineIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onLineModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/line.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="rectangleIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onRectangleModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/shapeimage_17.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="ellipseIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onEllipseModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/circle.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="ereaserIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onEreaserModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/eraser.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="starIcon" fitHeight="29.0" fitWidth="28.0" onMouseClicked="#onStarModeSelected" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/star.png" />
+               </image>
+            </ImageView>
         </items>
       </ToolBar>
       <ScrollPane fx:id="scrollPane" layoutY="111.0" prefHeight="509.0" prefWidth="744.0">
@@ -68,7 +96,7 @@
       <ToolBar layoutY="69.0" prefHeight="42.0" prefWidth="744.0">
          <items>
             <Label text="Size:" />
-            <TextField fx:id="textBoxSize" prefHeight="27.0" prefWidth="43.0" />
+            <TextField fx:id="sizeTextBox" prefHeight="27.0" prefWidth="43.0" />
             <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
             <Label text="Color:" />
             <GridPane prefHeight="30.0" prefWidth="30.0">
@@ -91,6 +119,5 @@
             <Line endX="-100.0" endY="28.292892456054688" startX="-100.0" />
          </items>
       </ToolBar>
-      <Label fx:id="labelTest" layoutX="481.0" layoutY="620.0" text="#test" />
    </children>
 </AnchorPane>

@@ -1,15 +1,11 @@
 package paint_java;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -18,23 +14,22 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javafx.embed.swing.SwingFXUtils;
-import javafx.util.Duration;
 
 import javax.imageio.ImageIO;
 
-// TODO применение эффектов после гауссиана
-// TODO проверка размера
-// TODO очистка переменных при открытии нового
+// добавить галочку заливки рисуемой фигуры
+// обрезка того, что оказалось вне изображения
+// TODO финальный тест
 
 enum PaintModes { brush, rectangle, line, ellipse, ereaser, star };
 
@@ -43,7 +38,7 @@ public class MainWindowController {
     private Color _color = new Color(1, 1, 1, 1);
     private Color _ereaserColor = new Color(1, 1, 1, 1);
     private Image _image;
-    private String _currentImagePath = "";
+    private String _currentImagePath;
     private int _mousePressedX;
     private int _mousePressedY;
     private int _mouseReleasedX;
@@ -55,19 +50,28 @@ public class MainWindowController {
     private double _origImageWight;
 
     @FXML
+    public ImageView pencilIcon;
+    @FXML
+    public ImageView lineIcon;
+    @FXML
+    public ImageView rectangleIcon;
+    @FXML
+    public ImageView ellipseIcon;
+    @FXML
+    public ImageView ereaserIcon;
+    @FXML
+    public ImageView starIcon;
+
+    @FXML
     public ScrollPane scrollPane;
     @FXML
     public Label scaleLabel;
     @FXML
-    public TextField textBoxSize;
+    public TextField sizeTextBox;
     @FXML
     public Group paintingGroup;
     @FXML
     public ImageView imageView;
-    @FXML
-    public Button buttonModeBrush;
-    @FXML
-    public Button buttonModeLine;
     @FXML
     public Label labelX;
     @FXML
@@ -77,9 +81,51 @@ public class MainWindowController {
     @FXML
     public javafx.scene.shape.Rectangle colorRectangle;
     @FXML
-    public Label labelTest;
-    @FXML
     public AnchorPane pane;
+
+    private double getSize(){
+        double res;
+        try{
+            res = Double.valueOf(sizeTextBox.getText());
+        }
+        catch (Exception e){
+            return 2;
+        }
+
+        if (res > 0 && res < 400){
+            return res*_scale;
+        }
+        else
+            return 2;
+    }
+
+    private void mergeImage(){
+        imageView.setFitHeight(_origImageHeight);
+        imageView.setFitWidth(_origImageWight);
+        double lastHscrollPosition = scrollPane.getHvalue();
+        double lastVscrollPosition = scrollPane.getVvalue();
+
+        WritableImage snapshot = paintingGroup.snapshot(new SnapshotParameters(), null);
+
+        paintingGroup.getChildren().clear();
+
+        imageView.setEffect(null);
+        _invisibleRectangle.setEffect(null);
+        _image = snapshot;
+        imageView.setImage(_image);
+
+        paintingGroup.getChildren().add(imageView);
+        paintingGroup.getChildren().add(_invisibleRectangle);
+
+        double newScale = 1;
+        while (_scale < newScale){ // восстановка масштаба
+            imageView.setFitHeight(imageView.getFitHeight() * 0.5);
+            newScale *= 0.5;
+        }
+
+        scrollPane.setHvalue(lastHscrollPosition); // восстановка положения в scrollPane
+        scrollPane.setVvalue(lastVscrollPosition);
+    }
 
     public void loadImage(String fileName){
         paintingGroup.getChildren().clear();
@@ -88,14 +134,7 @@ public class MainWindowController {
         imageView.setFitHeight(_image.getHeight());
         imageView.setFitWidth(_image.getWidth());
         imageView.setImage(_image);
-
         _scale = 1;
-
-//        double tm = 1;
-//        while (tm > _scale){
-//            imageView.setFitHeight(imageView.getFitHeight() / 2);
-//            tm = tm / 2;
-//        }
 
         _invisibleRectangle.setHeight(imageView.getImage().getHeight());
         _invisibleRectangle.setWidth(imageView.getImage().getWidth());
@@ -104,6 +143,30 @@ public class MainWindowController {
 
         _origImageHeight = _image.getHeight();
         _origImageWight = _image.getWidth();
+    }
+
+    @FXML
+    public void saveImageWithDialog(){
+        _fileChooser.setInitialFileName("image.png"); // "test.png"
+        _currentImagePath = _fileChooser.showSaveDialog(null).getPath();
+        saveImage();
+    }
+
+    public void saveImage(){
+        while (_scale < 1)
+            setScale(2);
+
+        try
+        {
+            WritableImage snapshot = paintingGroup.snapshot(new SnapshotParameters(), null);
+            File file = new File(_currentImagePath);
+            RenderedImage renderedImage = SwingFXUtils.fromFXImage(snapshot, null);
+            ImageIO.write(renderedImage, "png", file);
+        }
+        catch (IOException ex)
+        {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public String getImagePath(){
@@ -153,11 +216,12 @@ public class MainWindowController {
             int i = 0;
             while (true){
                 Node node = paintingGroup.getChildren().get(i);
-                applyGaussian(node);
+                node.setEffect(new GaussianBlur(30));
                 i++;
             }
         }
         catch (Exception e){            }
+        mergeImage();
     }
 
     @FXML
@@ -188,6 +252,8 @@ public class MainWindowController {
 
     @FXML
     private void setNegative(){
+        mergeImage();
+
         PixelReader pr = _image.getPixelReader();
         WritableImage wi = new WritableImage(pr, (int) _image.getWidth(), (int) _image.getHeight());
         PixelWriter pw = wi.getPixelWriter();
@@ -200,47 +266,127 @@ public class MainWindowController {
         }
         _image = wi;
         imageView.setImage(wi);
+    }
 
-        try{
-            int i = 0;
-            while (true){
-                Object t = paintingGroup.getChildren().get(i); // негатив, размытие, проверка размера, очистка переменных при открытии нового
-                switch (t.getClass().getSimpleName()) {
-                    case "Line": {
-                        Line u = (Line) t;
-                        Color c = (Color)u.getStroke();
-                        Color n = new Color(1. - c.getRed(), 1. - c.getGreen(),1. - c.getBlue(), c.getOpacity());
-                        u.setStroke(n);
-                        break;
-                    }
-                    case "Rectangle": {
-                        Rectangle u = (Rectangle) t;
-                        Color c = (Color)u.getFill();
-                        Color n = new Color(1. - c.getRed(), 1. - c.getGreen(),1. - c.getBlue(), c.getOpacity());
-                        u.setFill(n);
-                        u.setStroke(n);
-                        break;
-                    }
-                    case "Ellipse": {
-                        Ellipse u = (Ellipse) t;
-                        Color c = (Color)u.getFill();
-                        Color n = new Color(1. - c.getRed(), 1. - c.getGreen(),1. - c.getBlue(), c.getOpacity());
-                        u.setFill(n);
-                        break;
-                    }
-                    case "Polygon": {
-                        Polygon u = (Polygon)t;
-                        Color c = (Color)u.getFill();
-                        Color n = new Color(1. - c.getRed(), 1. - c.getGreen(),1. - c.getBlue(), c.getOpacity());
-                        u.setFill(n);;
-                        break;
-                    }
+    @FXML
+    private void setSharpness(){
+        mergeImage();
+        PixelReader pr = _image.getPixelReader();
+        WritableImage newImage = new WritableImage(pr, (int) _image.getWidth(), (int) _image.getHeight());
+        PixelWriter newImagePW = newImage.getPixelWriter();
+
+        double[] filter = {-1, -1, -1, -1, 9, -1, -1, -1, -1};
+
+        for (int y = 1; y < _image.getHeight() - 1; y++) {
+            for (int x = 1; x < _image.getWidth() - 1; x++) {
+                double red = 0;
+                double green = 0;
+                double blue = 0;
+
+                Color[] c = new Color[9];
+
+                c[0] = pr.getColor(x - 1, y - 1);
+                c[1] = pr.getColor(x, y - 1);
+                c[2] = pr.getColor(x + 1, y - 1);
+
+                c[3] = pr.getColor(x - 1, y);
+                c[4] = pr.getColor(x, y);
+                c[5] = pr.getColor(x + 1, y);
+
+                c[6] = pr.getColor(x - 1, y + 1);
+                c[7] = pr.getColor(x, y + 1);
+                c[8] = pr.getColor(x + 1, y + 1);
+
+                for (int i = 0; i < 9; i++){
+                    red += c[i].getRed() * filter[i];
                 }
-                i++;
+                for (int i = 0; i < 9; i++){
+                    green += c[i].getGreen() * filter[i];
+                }
+                for (int i = 0; i < 9; i++){
+                    blue += c[i].getBlue() * filter[i];
+                }
+
+                if (red > 1)
+                    red = 1;
+                if (green > 1)
+                    green = 1;
+                if (blue > 1)
+                    blue = 1;
+
+                if (red < 0)
+                    red = 0;
+                if (green < 0)
+                    green = 0;
+                if (blue < 0)
+                    blue = 0;
+
+                newImagePW.setColor(x, y, new Color(red, green, blue, 1));
             }
         }
-        catch (Exception e){            }
 
+        _image = newImage;
+        imageView.setImage(newImage);
+    }
+
+    @FXML
+    private void setDistraction(){
+        mergeImage();
+        PixelReader pr = _image.getPixelReader();
+        WritableImage newImage = new WritableImage(pr, (int) _image.getWidth(), (int) _image.getHeight());
+        PixelWriter newImagePW = newImage.getPixelWriter();
+
+        double[] filter = {1./9., 1./9., 1./9., 1./9., 1./9., 1./9., 1./9., 1./9., 1./9.};
+        for (int y = 1; y < _image.getHeight() - 1; y++) {
+            for (int x = 1; x < _image.getWidth() - 1; x++) {
+                double red = 0;
+                double green = 0;
+                double blue = 0;
+
+                Color[] c = new Color[9];
+
+                c[0] = pr.getColor(x - 1, y - 1);
+                c[1] = pr.getColor(x, y - 1);
+                c[2] = pr.getColor(x + 1, y - 1);
+
+                c[3] = pr.getColor(x - 1, y);
+                c[4] = pr.getColor(x, y);
+                c[5] = pr.getColor(x + 1, y);
+
+                c[6] = pr.getColor(x - 1, y + 1);
+                c[7] = pr.getColor(x, y + 1);
+                c[8] = pr.getColor(x + 1, y + 1);
+
+                for (int i = 0; i < 9; i++){
+                    red += c[i].getRed() * filter[i];
+                }
+                for (int i = 0; i < 9; i++){
+                    green += c[i].getGreen() * filter[i];
+                }
+                for (int i = 0; i < 9; i++){
+                    blue += c[i].getBlue() * filter[i];
+                }
+
+                if (red > 1)
+                    red = 1;
+                if (green > 1)
+                    green = 1;
+                if (blue > 1)
+                    blue = 1;
+
+                if (red < 0)
+                    red = 0;
+                if (green < 0)
+                    green = 0;
+                if (blue < 0)
+                    blue = 0;
+
+                newImagePW.setColor(x, y, new Color(red, green, blue, 1));
+            }
+        }
+
+        _image = newImage;
+        imageView.setImage(newImage);
     }
 
     private void applyHighContrast(Node node) {
@@ -255,150 +401,77 @@ public class MainWindowController {
         node.setEffect(colorAdjust);
     }
 
-    private void applyGaussian(Node node) {
-        GaussianBlur blur = new GaussianBlur(0);
-        node.setEffect(blur);
-
-        Timeline timeline = new Timeline();
-        KeyValue kv = new KeyValue(blur.radiusProperty(), 40.);
-        KeyFrame kf = new KeyFrame(Duration.millis(1), kv);
-        timeline.getKeyFrames().add(kf);
-        timeline.play();
-    }
-
     @FXML
     public void onPlusViewButtonPressed(){
         if (_scale < 1) {
-            _scale = _scale * 2;
-            scaleLabel.setText(String.valueOf(_scale * 100) + "%");
-
-            imageView.setFitHeight(imageView.getFitHeight() * 2);
-
-            try{
-                int i = 0;
-                while (true){
-                    Object t = paintingGroup.getChildren().get(i); // негатив, размытие, проверка размера, очистка переменных при открытии нового
-                    switch (t.getClass().getSimpleName()) {
-                        case "Line": {
-                            Line u = (Line) t;
-                            u.setStartX(u.getStartX() * 2);
-                            u.setStartY(u.getStartY() * 2);
-                            u.setEndX(u.getEndX() * 2);
-                            u.setEndY(u.getEndY() * 2);
-                            u.setStrokeWidth(u.getStrokeWidth() * 2);
-                            break;
-                        }
-                        case "Rectangle": {
-                            Rectangle u = (Rectangle) t;
-                            u.setX(u.getX() * 2);
-                            u.setY(u.getY() * 2);
-                            u.setHeight(u.getHeight() * 2);
-                            u.setWidth(u.getWidth() * 2);
-                            break;
-                        }
-                        case "Ellipse": {
-                            Ellipse u = (Ellipse) t;
-                            u.setCenterX(u.getCenterX() * 2);
-                            u.setCenterY(u.getCenterY() * 2);
-                            u.setRadiusX(u.getRadiusX() * 2);
-                            u.setRadiusY(u.getRadiusY() * 2);
-                            break;
-                        }
-                        case "Polygon": { // TODO fix resize
-                            Polygon u = (Polygon)t;
-                            paintingGroup.getChildren().remove(u);
-                            Polygon newPol = new Polygon();
-                            newPol.setFill(u.getFill());
-
-                            //System.out.println("##########");
-
-                            try{
-                                int j = 0;
-                                while (true){
-                                    double val = u.getPoints().get(j);
-                                    newPol.getPoints().add(val * 2.);
-                                    //System.out.println("!!! " + u.getPoints().get(j) + " " + newPol.getPoints().get(j));
-                                    j++;
-                                }
-                            }
-                            catch (Exception e){  }
-                            paintingGroup.getChildren().add(newPol);
-                            break;
-                        }
-                    }
-                    i++;
-                }
-            }
-            catch (Exception e){            }
+            setScale(2);
         }
     }
 
     @FXML
     public void onMinusViewButtonPressed(){
         if (_scale > 0.1) {
-            _scale = _scale / 2;
-            scaleLabel.setText(String.valueOf(_scale * 100) + "%");
-
-            imageView.setFitHeight(imageView.getFitHeight() / 2);
-
-            try{
-                int i = 0;
-                while (true){
-                    Object t = paintingGroup.getChildren().get(i);
-                    switch (t.getClass().getSimpleName()){
-                        case "Line":{
-                            Line u = (Line)t;
-                            u.setStartX(u.getStartX() / 2);
-                            u.setStartY(u.getStartY() / 2);
-                            u.setEndX(u.getEndX() / 2);
-                            u.setEndY(u.getEndY() / 2);
-                            u.setStrokeWidth(u.getStrokeWidth() / 2);
-                            break;
-                        }
-                        case "Rectangle":{
-                            Rectangle u = (Rectangle) t;
-                            u.setX(u.getX() / 2);
-                            u.setY(u.getY() / 2);
-                            u.setHeight(u.getHeight() / 2);
-                            u.setWidth(u.getWidth() / 2);
-                            break;
-                        }
-                        case "Ellipse":{
-                            Ellipse u = (Ellipse)t;
-                            u.setCenterX(u.getCenterX() / 2);
-                            u.setCenterY(u.getCenterY() / 2);
-                            u.setRadiusX(u.getRadiusX() / 2);
-                            u.setRadiusY(u.getRadiusY() / 2);
-                            break;
-                        }
-                        case "Polygon":{
-                            Polygon u = (Polygon)t;
-                            paintingGroup.getChildren().remove(u);
-                            Paint paint = u.getFill();
-                            Polygon newPol = new Polygon();
-                            newPol.setFill(paint);
-
-                            //System.out.println("$$$$$$$$"); // TODO почему это вызывается дважды
-
-                            try{
-                                int j = 0;
-                                while (true){
-                                    double val = u.getPoints().get(j);
-                                    newPol.getPoints().add(val / 2.);
-                                    //System.out.println(u.getPoints().get(j) + " " + newPol.getPoints().get(j));
-                                    j++;
-                                }
-                            }
-                            catch (Exception e){  }
-                            paintingGroup.getChildren().add(newPol);
-                            break;
-                        }
-                    }
-                    i++;
-                }
-            }
-            catch (Exception e){            }
+            setScale(0.5);
         }
+    }
+
+    private void setScale(double coefficient){
+        _scale = _scale  * coefficient;
+        scaleLabel.setText(String.valueOf(_scale * 100) + "%");
+
+        imageView.setFitHeight(imageView.getFitHeight() * coefficient);
+
+        try{
+            int i = 0;
+            while (true){
+                Object t = paintingGroup.getChildren().get(i);
+                switch (t.getClass().getSimpleName()){
+                    case "Line":{
+                        Line u = (Line)t;
+                        u.setStartX(u.getStartX() * coefficient);
+                        u.setStartY(u.getStartY() * coefficient);
+                        u.setEndX(u.getEndX() * coefficient);
+                        u.setEndY(u.getEndY() * coefficient);
+                        u.setStrokeWidth(u.getStrokeWidth() * coefficient);
+                        break;
+                    }
+                    case "Rectangle":{
+                        Rectangle u = (Rectangle) t;
+                        u.setX(u.getX() * coefficient);
+                        u.setY(u.getY()  * coefficient);
+                        u.setHeight(u.getHeight()  * coefficient);
+                        u.setWidth(u.getWidth()  * coefficient);
+                        break;
+                    }
+                    case "Ellipse":{
+                        Ellipse u = (Ellipse)t;
+                        u.setCenterX(u.getCenterX() * coefficient);
+                        u.setCenterY(u.getCenterY() * coefficient);
+                        u.setRadiusX(u.getRadiusX() * coefficient);
+                        u.setRadiusY(u.getRadiusY() * coefficient);
+                        break;
+                    }
+                    case "Polygon":{
+                        Polygon u = (Polygon)t;
+                        Polygon np = new Polygon();
+
+                        np.setFill(u.getFill());
+                        np.setStroke(u.getStroke());
+
+                        for (int j = 0; j < 20; j++){
+                            double val = u.getPoints().get(j);
+                            np.getPoints().add(val * coefficient);
+                        }
+
+                        paintingGroup.getChildren().remove(i);
+                        paintingGroup.getChildren().add(i, np);
+                        break;
+                    }
+                }
+                i++;
+            }
+        }
+        catch (Exception e){}
     }
 
     @FXML
@@ -427,34 +500,10 @@ public class MainWindowController {
         colorRectangle.setFill(_color);
     }
 
-    @FXML
-    public void saveImageWithDialog(){
-        _fileChooser.setInitialFileName(_currentImagePath); // "test.png"
-        _currentImagePath = _fileChooser.showSaveDialog(null).getPath();
-
-        saveImage();
-    }
 
     @FXML
     public void quit(){
         System.exit(0);
-    }
-
-    public void saveImage(){
-        imageView.setFitHeight(_origImageHeight);
-        imageView.setFitWidth(_origImageWight);
-
-        try
-        {
-            WritableImage snapshot = paintingGroup.snapshot(new SnapshotParameters(), null);
-            File file = new File("image.jpg");
-            RenderedImage renderedImage = SwingFXUtils.fromFXImage(snapshot, null);
-            ImageIO.write(renderedImage, "jpg", file);
-        }
-        catch (IOException ex)
-        {
-            System.out.println(ex.getMessage());
-        }
     }
 
     private Polygon createStar(double centerX, double centerY, double size){
@@ -467,8 +516,8 @@ public class MainWindowController {
                 star.getPoints().add(Math.cos(Math.toRadians(i*36 - 90)) * size + centerY); // у длинной
             }
             else {
-                star.getPoints().add(Math.sin(Math.toRadians(i*36 - 90)) * (size / 3.0) + centerX); // х длинной
-                star.getPoints().add(Math.cos(Math.toRadians(i*36 - 90)) * (size / 3.0) + centerY); // у длинной
+                star.getPoints().add(Math.sin(Math.toRadians(i*36 - 90)) * (size / 3.0) + centerX); // х короткой
+                star.getPoints().add(Math.cos(Math.toRadians(i*36 - 90)) * (size / 3.0) + centerY); // у короткой
             }
         }
 
@@ -483,11 +532,24 @@ public class MainWindowController {
         double dX = Math.abs(startX - endX);
         double dY = Math.abs(startY - endY);
 
-        return Math.sqrt(dX*dX + dY*dY); // TODO резкость фильтр, офф ресайз при гауссиане
+        return Math.sqrt(dX*dX + dY*dY);
     }
 
     @FXML
     public void initialize(){
+        pencilIcon.setImage(new Image("file:" +
+                "icons/pencil.png"));
+        lineIcon.setImage(new Image("file:" +
+                "icons/line.png"));
+        rectangleIcon.setImage(new Image("file:" +
+                "icons/shapeimage_17.png"));
+        ellipseIcon.setImage(new Image("file:" +
+                "icons/circle.png"));
+        ereaserIcon.setImage(new Image("file:" +
+                "icons/eraser.png"));
+        starIcon.setImage(new Image("file:" +
+                "icons/star.png"));
+
         _fileChooser = new FileChooser();
         _invisibleRectangle = new Rectangle();
 
@@ -507,7 +569,7 @@ public class MainWindowController {
                     else
                         line.setStroke(_ereaserColor);
 
-                    line.strokeWidthProperty().setValue(Integer.valueOf(textBoxSize.getText())*_scale);
+                    line.strokeWidthProperty().setValue(getSize());
                     paintingGroup.getChildren().add(line);
 
                     _mousePressedX = (int) event.getX();
@@ -544,7 +606,7 @@ public class MainWindowController {
                     javafx.scene.shape.Line line = new Line(_mousePressedX,
                             _mousePressedY, _mouseReleasedX, _mouseReleasedY);
                     line.setStroke(_color);
-                    line.strokeWidthProperty().setValue(Integer.valueOf(textBoxSize.getText())*_scale);
+                    line.strokeWidthProperty().setValue(getSize());
                     paintingGroup.getChildren().add(line);
                 }
                 if (_mode == PaintModes.ellipse) {
@@ -568,7 +630,7 @@ public class MainWindowController {
 
         labelMode.setText("tool: " + _mode.name());
         colorRectangle.setFill(_color);
-        textBoxSize.setText("1");
+        sizeTextBox.setText("1");
 
         loadImageWithDialog();
     }
