@@ -29,7 +29,8 @@ import javax.imageio.ImageIO;
 
 // добавить галочку заливки рисуемой фигуры
 // обрезка того, что оказалось вне изображения
-// TODO финальный тест
+
+// TODO убрать заливку прямоугольника и звезды
 
 enum PaintModes { brush, rectangle, line, ellipse, ereaser, star };
 
