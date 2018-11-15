@@ -27,10 +27,6 @@ import javafx.embed.swing.SwingFXUtils;
 
 import javax.imageio.ImageIO;
 
-// добавить галочку заливки рисуемой фигуры
-// обрезка того, что оказалось вне изображения
-
-// TODO убрать заливку прямоугольника и звезды
 
 enum PaintModes { brush, rectangle, line, ellipse, ereaser, star };
 
